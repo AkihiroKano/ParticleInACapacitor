@@ -10,6 +10,7 @@ public class Program
             double u = double.Parse(Console.ReadLine());
 
             var simulation = new ElectronSimulation(u);
+            
             if (simulation.Simulate())
             {
                 Console.WriteLine($"Минимальное U для удержания электрона: {BinarySearch.FindThresholdVoltage():F5}");

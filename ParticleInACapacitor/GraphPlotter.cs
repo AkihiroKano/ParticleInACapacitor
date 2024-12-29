@@ -54,6 +54,7 @@ public static class GraphPlotter
             // Заполняем серию точками графика.
             var xArray = xData.ToArray();
             var yArray = yData.ToArray();
+            
             for (int i = 0; i < xArray.Length; i++)
             {
                 lineSeries.Points.Add(new DataPoint(xArray[i], yArray[i])); // Добавляем точку на график.

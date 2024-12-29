@@ -7,6 +7,7 @@ public static class BinarySearch
     {
         double left = 2; // Нижняя граница поиска.
         double right = 100; // Верхняя граница поиска.
+        
         while (right - left > 0.00001) // Условие с заданной точностью.
         {
             double mid = (left + right) / 2; // Среднее значение между левым и правым.
@@ -16,6 +17,7 @@ public static class BinarySearch
             else
                 left = mid; // Сдвигаем нижнюю границу.
         }
+
         return right; // Возвращаем минимальное напряжение.
     }
 }
