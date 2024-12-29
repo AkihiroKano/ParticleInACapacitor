@@ -6,48 +6,71 @@ using OxyPlot.SkiaSharp;
 namespace ParticleInACapacitor;
 
 public static class GraphPlotter
-{
-    public static void PlotAndSaveGraphs(
-        List<double> times,
-        List<double> positions,
-        List<double> velocities,
-        List<double> accelerations,
-        List<double> xCoords)
     {
-        PlotGraph(times, positions, "y(t)", "Time (s)", "Position (m)", "y_t.png");
-        PlotGraph(times, velocities, "v_y(t)", "Time (s)", "Velocity (m/s)", "v_y_t.png");
-        PlotGraph(times, accelerations, "a_y(t)", "Time (s)", "Acceleration (m/s²)", "a_y_t.png");
-        PlotGraph(xCoords, positions, "y(x)", "X Position (m)", "Y Position (m)", "y_x.png");
-    }
-
-    private static void PlotGraph(
-        List<double> xData,
-        List<double> yData,
-        string title,
-        string xLabel,
-        string yLabel,
-        string fileName)
-    {
-        var plotModel = new PlotModel { Title = title };
-
-        plotModel.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = xLabel });
-        plotModel.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = yLabel });
-
-        var lineSeries = new LineSeries();
-        for (int i = 0; i < xData.Count; i++)
+        // Метод PlotAndSaveGraphs создает все графики для данных симуляции и сохраняет их в файлы.
+        public static void PlotAndSaveGraphs(
+            IEnumerable<double> times, // Временные точки t.
+            IEnumerable<double> positions, // Позиции y(t).
+            IEnumerable<double> velocities, // Скорости v_y(t).
+            IEnumerable<double> accelerations, // Ускорения a_y(t).
+            IEnumerable<double> xCoords // Координаты x(t).
+        )
         {
-            lineSeries.Points.Add(new DataPoint(xData[i], yData[i]));
+            // Создаем график зависимости y(t) — положение от времени.
+            Plot(times, positions, "y(t)", "Время (с)", "Позиция (м)", "y_t.png");
+
+            // Создаем график зависимости v_y(t) — скорость от времени.
+            Plot(times, velocities, "v_y(t)", "Время (с)", "Скорость (м/с)", "v_y_t.png");
+
+            // Создаем график зависимости a_y(t) — ускорение от времени.
+            Plot(times, accelerations, "a_y(t)", "Время (с)", "Ускорение (м/с²)", "a_y_t.png");
+
+            // Создаем график зависимости y(x) — положение y от координаты x.
+            Plot(xCoords, positions, "y(x)", "Позиция X (м)", "Позиция Y (м)", "y_x.png");
         }
 
-        plotModel.Series.Add(lineSeries);
-
-        string basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-        string outputPath = Path.Combine(basePath, fileName);
-        
-        using (var stream = File.Create(outputPath))
+        // Вспомогательный метод Plot создает отдельный график и сохраняет его в файл.
+        private static void Plot(
+            IEnumerable<double> xData, // Данные по оси X.
+            IEnumerable<double> yData, // Данные по оси Y.
+            string title, // Заголовок графика.
+            string xLabel, // Подпись оси X.
+            string yLabel, // Подпись оси Y.
+            string fileName // Имя файла для сохранения графика.
+        )
         {
-            var exporter = new PngExporter { Width = 600, Height = 400};
-            exporter.Export(plotModel, stream);
+            // Создаем объект графика с заданным заголовком.
+            var plotModel = new PlotModel { Title = title };
+
+            // Добавляем ось X с подписью.
+            plotModel.Axes.Add(new LinearAxis { Position = AxisPosition.Bottom, Title = xLabel });
+
+            // Добавляем ось Y с подписью.
+            plotModel.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = yLabel });
+
+            // Создаем серию линий (график).
+            var lineSeries = new LineSeries();
+
+            // Заполняем серию точками графика.
+            var xArray = xData.ToArray();
+            var yArray = yData.ToArray();
+            for (int i = 0; i < xArray.Length; i++)
+            {
+                lineSeries.Points.Add(new DataPoint(xArray[i], yArray[i])); // Добавляем точку на график.
+            }
+
+            // Добавляем серию на модель графика.
+            plotModel.Series.Add(lineSeries);
+
+            // Определяем путь для сохранения файла.
+            string basePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName; // Базовая директория.
+            string outputPath = Path.Combine(basePath, fileName); // Полный путь к файлу.
+
+            // Сохраняем график как PNG.
+            using (var stream = File.Create(outputPath))
+            {
+                var exporter = new PngExporter { Width = 600, Height = 400 }; // Задаем параметры изображения.
+                exporter.Export(plotModel, stream); // Экспортируем график в файл.
+            }
         }
     }
-}
